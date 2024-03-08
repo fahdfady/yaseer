@@ -1,0 +1,19 @@
+{
+  "name": "yaseer",
+  "version": "0.0.1",
+  "description": "a simple JavaScript library",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.spec.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fahdfady/yaseer.git"
+  },
+  "author": "fahddev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fahdfady/yaseer/issues"
+  },
+  "homepage": "https://github.com/fahdfady/yaseer#readme"
+}
