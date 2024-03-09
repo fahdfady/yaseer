@@ -2,9 +2,19 @@
   "name": "yaseer",
   "version": "0.0.1",
   "description": "a simple JavaScript library",
-  "main": "index.js",
+  "type": "module",
+  "files": ["/dist"],
+  "main":"./dist/yaseer.util.umd.js"
+  ,"module": "./dist/yaseer.utils.mjs",
+  "exports": {
+    ".": {
+      "import": ".g/dist/yaseer.utils.mjs",
+      "require": "./dist/yaseer.util.umd.js"
+    }
+  },
   "scripts": {
-    "test": "node index.spec.mjs"
+    "test": "node index.spec.mjs",
+    "dev": "tsc -w"
   },
   "repository": {
     "type": "git",
@@ -15,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/fahdfady/yaseer/issues"
   },
-  "homepage": "https://github.com/fahdfady/yaseer#readme"
+  "homepage": "https://github.com/fahdfady/yaseer#readme",
+  "dependencies": {
+    "typescript": "^5.4.2",
+    "vite": "^5.1.5"
+  }
 }
