@@ -8,7 +8,7 @@
   ,"module": "./dist/yaseer.utils.mjs",
   "exports": {
     ".": {
-      "import": ".g/dist/yaseer.utils.mjs",
+      "import": "./dist/yaseer.utils.mjs",
       "require": "./dist/yaseer.util.umd.js"
     }
   },
