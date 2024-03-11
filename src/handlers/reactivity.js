@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createEffect = exports.createSignal = void 0;
 const context = [];
 function subscribe(running, subscribers) {
     subscribers.add(running);
@@ -9,7 +12,7 @@ function cleanup(running) {
     }
     running.dependencies.clear();
 }
-export function createSignal(value) {
+function createSignal(value) {
     const subscribers = new Set();
     const getter = () => {
         const running = context[context.length - 1];
@@ -25,7 +28,8 @@ export function createSignal(value) {
     };
     return [getter, setter];
 }
-export function createEffect(fn) {
+exports.createSignal = createSignal;
+function createEffect(fn) {
     const execute = () => {
         cleanup(running);
         context.push(running);
@@ -43,3 +47,4 @@ export function createEffect(fn) {
     execute();
     console.log(running, context, execute);
 }
+exports.createEffect = createEffect;

@@ -3,20 +3,21 @@
   "version": "0.0.4",
   "description": "a simple JavaScript library",
   "type": "module",
+  "types": "./y/yaseer.utils.d.ts",
   "files": [
-    "/y"
+    "y"
   ],
-  "main": "./y/yaseer.util.umd.js",
-  "module": "./y/yaseer.utils.mjs",
+  "main": "./y/yaseer.util.umd.cjs",
+  "module": "./y/yaseer.utils.js",
   "exports": {
     ".": {
-      "import": "./y/yaseer.utils.mjs",
-      "require": "./y/yaseer.util.umd.js"
+      "import": "./y/yaseer.utils.js",
+      "require": "./y/yaseer.util.umd.cjs"
     }
   },
   "scripts": {
     "test": "node index.spec.mjs",
-    "build": "vite build",
+    "build": "tsc --noEmit && vite build",
     "watch": "vite build --watch",
     "build:types": "tsc -m amd -t ESNext -d --isolatedModules false  --moduleResolution node --esModuleInterop --outFile y/yaseer.utils.js src/index.ts"
   },
@@ -35,5 +36,8 @@
     "path": "^0.12.7",
     "typescript": "^5.4.2",
     "vite": "^5.1.5"
+  },
+  "dependencies": {
+    "vite-plugin-dts": "^3.7.3"
   }
 }
