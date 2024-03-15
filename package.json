@@ -1,6 +1,6 @@
 {
   "name": "yaseer",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "a simple JavaScript library",
   "type": "module",
   "types": "./y/yaseer.utils.d.ts",

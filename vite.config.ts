@@ -8,12 +8,17 @@ export default defineConfig({
     })],
     build: {
         lib: {
-            entry: resolve('src', 'index.ts'),
-            name: 'Yaseer',
+            entry: resolve(__dirname, 'src', 'index.ts'),
+            name: 'yaseer',
             fileName: 'yaseer.utils',
             formats: ['es', 'cjs', 'umd', 'iife']
         },
         rollupOptions: {
+            // input: [
+            //     resolve(__dirname, 'src', 'handlers', 'ddom.ts'),
+            //     resolve(__dirname, 'src', 'handlers', 'nest.ts'),
+            //     resolve(__dirname, 'src', 'handlers', 'reactivity.ts'),
+            // ],
             external: [],
             output: {
                 globals: {}
