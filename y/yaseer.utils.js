@@ -1,4 +1,4 @@
-function u(e, t, n) {
+function p(e, t, n) {
   let o;
   function c() {
     if (!o) {
@@ -12,10 +12,10 @@ function u(e, t, n) {
   }
   return c();
 }
-function l(e, t) {
+function h(e, t) {
   e.appendChild(t);
 }
-function p(e, t) {
+function w(e, t) {
   if (Array.isArray(t))
     for (const n of t)
       if (Array.isArray(n))
@@ -28,19 +28,19 @@ function p(e, t) {
   return e;
 }
 const r = [];
-function f(e, t) {
+function u(e, t) {
   t.add(e), e.dependencies.add(t);
 }
-function d(e) {
+function f(e) {
   for (const t of e.dependencies)
     t.delete(e);
   e.dependencies.clear();
 }
-function a(e) {
+function m(e) {
   const t = /* @__PURE__ */ new Set();
   return [() => {
     const c = r[r.length - 1];
-    return c && f(c, t), e;
+    return c && u(c, t), e;
   }, (c) => {
     e = c;
     for (const s of [...t])
@@ -49,7 +49,7 @@ function a(e) {
 }
 function y(e) {
   const t = () => {
-    d(n), r.push(n);
+    f(n), r.push(n);
     try {
       e();
     } finally {
@@ -60,10 +60,30 @@ function y(e) {
   };
   t(), console.log(n, r, t);
 }
+const l = (e) => {
+  e = e || window.event, e.preventDefault(), window.history.pushState({}, "", e.target.href), a();
+}, d = {
+  // 404: '/404',
+  // '/': 'Home',
+  // '/about': 'About',
+  // '/contact': 'Contact'
+}, C = (e, t) => {
+  const n = document.createElement("a");
+  n.href = e;
+  const o = document.createTextNode(t);
+  return n.appendChild(o), document.body.appendChild(n), n;
+}, a = async () => {
+  const e = window.location.pathname, t = d[e] || d[404], n = await fetch(t).then((o) => o.text());
+  document.body.innerHTML = n;
+};
+window.onpopstate = a;
+window.route = l;
 export {
+  C as Link,
   y as createEffect,
-  a as createSignal,
-  p as nest,
-  l as renderAppDDOM,
-  u as template
+  m as createSignal,
+  w as nest,
+  h as renderAppDDOM,
+  d as routes,
+  p as template
 };
