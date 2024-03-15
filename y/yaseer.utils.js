@@ -1,16 +1,4 @@
-function f(e, t) {
-  if (Array.isArray(t))
-    for (const n of t)
-      if (Array.isArray(n))
-        for (const o of n)
-          e.appendChild(o);
-      else
-        e.appendChild(n);
-  else
-    e.appendChild(t);
-  return e;
-}
-function l(e, t, n) {
+function u(e, t, n) {
   let o;
   function c() {
     if (!o) {
@@ -24,14 +12,26 @@ function l(e, t, n) {
   }
   return c();
 }
+function l(e, t) {
+  e.appendChild(t);
+}
 function p(e, t) {
-  e && f(e, t);
+  if (Array.isArray(t))
+    for (const n of t)
+      if (Array.isArray(n))
+        for (const o of n)
+          e.appendChild(o);
+      else
+        e.appendChild(n);
+  else
+    e.appendChild(t);
+  return e;
 }
 const r = [];
-function d(e, t) {
+function f(e, t) {
   t.add(e), e.dependencies.add(t);
 }
-function u(e) {
+function d(e) {
   for (const t of e.dependencies)
     t.delete(e);
   e.dependencies.clear();
@@ -40,7 +40,7 @@ function a(e) {
   const t = /* @__PURE__ */ new Set();
   return [() => {
     const c = r[r.length - 1];
-    return c && d(c, t), e;
+    return c && f(c, t), e;
   }, (c) => {
     e = c;
     for (const s of [...t])
@@ -49,7 +49,7 @@ function a(e) {
 }
 function y(e) {
   const t = () => {
-    u(n), r.push(n);
+    d(n), r.push(n);
     try {
       e();
     } finally {
@@ -63,6 +63,7 @@ function y(e) {
 export {
   y as createEffect,
   a as createSignal,
-  p as renderAppDDOM,
-  l as template
+  p as nest,
+  l as renderAppDDOM,
+  u as template
 };
