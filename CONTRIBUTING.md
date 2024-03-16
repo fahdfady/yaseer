@@ -20,6 +20,12 @@ We follow a specific code style in this project. Please make sure to adhere to t
 - Write clear and concise comments to explain your code. I personally recommend using GitHub copilot's `/doc` 
 - make sure to build after you finish coding
 
+## note
+
+this library uses Vite
+1. to Build: `npm run build`
+2. to watch: `npm run watch`
+
 ## Reporting Issues
 
 If you encounter any bugs, issues, or have suggestions for improvements, please open an issue on the GitHub repository. Provide as much detail as possible, including steps to reproduce the issue and any relevant code snippets.
