@@ -3,9 +3,9 @@ function p(e, t, n) {
   function c() {
     if (!o) {
       o = document.createElement(e);
-      for (const s in t) {
-        const i = t[s];
-        s.startsWith("on") && typeof i == "function" ? o.addEventListener(s.substring(2), i) : o.setAttribute(s, i);
+      for (const r in t) {
+        const s = t[r];
+        r.startsWith("on") && typeof s == "function" ? o.addEventListener(r.substring(2), s) : o.setAttribute(r, s);
       }
     }
     return n && (o.textContent = `${n}`), o;
@@ -15,7 +15,7 @@ function p(e, t, n) {
 function h(e, t) {
   e.appendChild(t);
 }
-function w(e, t) {
+function m(e, t) {
   if (Array.isArray(t))
     for (const n of t)
       if (Array.isArray(n))
@@ -27,29 +27,29 @@ function w(e, t) {
     e.appendChild(t);
   return e;
 }
-const r = [];
-function u(e, t) {
+const d = [];
+function l(e, t) {
   t.add(e), e.dependencies.add(t);
 }
-function f(e) {
+function u(e) {
   for (const t of e.dependencies)
     t.delete(e);
   e.dependencies.clear();
 }
-function m(e) {
+function w(e) {
   const t = /* @__PURE__ */ new Set();
   return [() => {
-    const c = r[r.length - 1];
-    return c && u(c, t), e;
+    const c = d[d.length - 1];
+    return c && l(c, t), e;
   }, (c) => {
     e = c;
-    for (const s of [...t])
-      s.execute();
+    for (const r of [...t])
+      r.execute();
   }];
 }
 function y(e) {
   const t = () => {
-    f(n), r.push(n);
+    u(n), d.push(n);
     try {
       e();
     } finally {
@@ -58,32 +58,41 @@ function y(e) {
     execute: t,
     dependencies: /* @__PURE__ */ new Set()
   };
-  t(), console.log(n, r, t);
+  t();
 }
-const l = (e) => {
+const f = (e) => {
   e = e || window.event, e.preventDefault(), window.history.pushState({}, "", e.target.href), a();
-}, d = {
+}, i = {
   // 404: '/404',
   // '/': 'Home',
   // '/about': 'About',
   // '/contact': 'Contact'
-}, C = (e, t) => {
+}, g = (e, t) => {
   const n = document.createElement("a");
   n.href = e;
   const o = document.createTextNode(t);
   return n.appendChild(o), document.body.appendChild(n), n;
 }, a = async () => {
-  const e = window.location.pathname, t = d[e] || d[404], n = await fetch(t).then((o) => o.text());
-  document.body.innerHTML = n;
+  console.log("handleLocationTEST");
+  const e = window.location.pathname, n = `./pages/${i[e] || i[404]}`;
+  console.log(n);
+  try {
+    const o = await import(n);
+    typeof o.default == "function" ? o.default() : console.error(`Module '${n}' does not have a default export function.`);
+  } catch (o) {
+    console.error(`Failed to import module '${n}':`, o);
+  }
+  console.log("handleLocationTEST22222");
 };
 window.onpopstate = a;
-window.route = l;
+console.log("Routing loaded.");
+window.route = f;
 export {
-  C as Link,
+  g as Link,
   y as createEffect,
-  m as createSignal,
-  w as nest,
+  w as createSignal,
+  m as nest,
   h as renderAppDDOM,
-  d as routes,
+  i as routes,
   p as template
 };

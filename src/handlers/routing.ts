@@ -46,12 +46,24 @@ export const Link = (route: string, text: string) => {
  * @returns {Promise<void>} A promise that resolves when the HTML content is updated.
  */
 const handleLocation = async (): Promise<void> => {
+    console.log("handleLocationTEST")
     const path = window.location.pathname;
     const route = routes[path] || routes[404];
-    const html = await fetch(route).then(data => data.text());
-    document.body.innerHTML = html;
+    const modulePath = `./pages/${route}`;
+    console.log(modulePath)
+    try {
+        const module = await import(modulePath);
+        if (typeof module.default === 'function') {
+            module.default();
+        } else {
+            console.error(`Module '${modulePath}' does not have a default export function.`);
+        }
+    } catch (error) {
+        console.error(`Failed to import module '${modulePath}':`, error);
+    }
+    console.log("handleLocationTEST22222")
 }
-
 window.onpopstate = handleLocation;
+console.log("Routing loaded.")
 
 window.route = Route; // Expose the route function to the window object

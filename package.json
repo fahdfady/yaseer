@@ -1,6 +1,6 @@
 {
   "name": "yaseer",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "a simple JavaScript library",
   "type": "module",
   "types": "./y/yaseer.utils.d.ts",
@@ -16,10 +16,8 @@
     }
   },
   "scripts": {
-    "test": "node index.spec.mjs",
     "build": "tsc --noEmit && vite build",
-    "watch": "vite build --watch",
-    "build:types": "tsc -m amd -t ESNext -d --isolatedModules false  --moduleResolution node --esModuleInterop --outFile y/yaseer.utils.js src/index.ts"
+    "watch": "tsc --noEmit && vite build --watch"
   },
   "repository": {
     "type": "git",
