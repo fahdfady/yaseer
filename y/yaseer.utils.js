@@ -1,6 +1,6 @@
 var h = Object.defineProperty;
-var l = (t, e, n) => e in t ? h(t, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : t[e] = n;
-var a = (t, e, n) => (l(t, typeof e != "symbol" ? e + "" : e, n), n);
+var u = (t, e, n) => e in t ? h(t, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : t[e] = n;
+var c = (t, e, n) => (u(t, typeof e != "symbol" ? e + "" : e, n), n);
 function P(t, e, n) {
   let o;
   function r() {
@@ -31,8 +31,8 @@ function w(t, e) {
     t.appendChild(e);
   return t;
 }
-const c = [];
-function u(t, e) {
+const a = [];
+function l(t, e) {
   e.add(t), t.dependencies.add(e);
 }
 function d(t) {
@@ -43,8 +43,8 @@ function d(t) {
 function y(t) {
   const e = /* @__PURE__ */ new Set();
   return [() => {
-    const r = c[c.length - 1];
-    return r && u(r, e), t;
+    const r = a[a.length - 1];
+    return r && l(r, e), t;
   }, (r) => {
     t = r;
     for (const s of [...e])
@@ -53,7 +53,7 @@ function y(t) {
 }
 function m(t) {
   const e = () => {
-    d(n), c.push(n);
+    d(n), a.push(n);
     try {
       t();
     } finally {
@@ -71,9 +71,9 @@ class f {
      * 
      * @constructor
      */
-    a(this, "routes");
-    a(this, "currentPath");
-    a(this, "previousPath");
+    c(this, "routes");
+    c(this, "currentPath");
+    c(this, "previousPath");
     this.routes = {}, this.currentPath = window.location.pathname, this.previousPath = null;
     const e = this.handlePopstate.bind(this), n = this.handleClick.bind(this);
     window.addEventListener("popstate", e), window.addEventListener("click", n);
@@ -111,11 +111,12 @@ class f {
     n ? n() : console.error("404: ", e);
   }
 }
-new f();
+const A = new f();
 export {
   m as createEffect,
   y as createSignal,
   w as nest,
   g as renderAppDDOM,
+  A as router,
   P as template
 };

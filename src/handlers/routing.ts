@@ -105,7 +105,7 @@ class Router {
 }
 
 
-const router = new Router();
+export const router = new Router();
 
 // router.on('/', () => {
 //     console.log('Home Page');
@@ -118,5 +118,3 @@ const router = new Router();
 // router.on('/contact', () => {
 //     console.log('Contact Page');
 // });
-
-export default router

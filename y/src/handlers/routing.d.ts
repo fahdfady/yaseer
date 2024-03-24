@@ -10,5 +10,5 @@ declare class Router {
     handleClick(e: MouseEvent): void;
     handleRoute(): void;
 }
-declare const router: Router;
-export default router;
+export declare const router: Router;
+export {};
