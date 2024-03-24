@@ -1,69 +1,122 @@
-declare global {
-    interface Window {
-        route: (e: any) => void;
+type RouteCallback = () => void;
+
+class Router {
+    /**
+     * Class to handle routing
+     * 
+     * @constructor
+     */
+    private routes: { [key: string]: RouteCallback };
+    private currentPath: string;
+    private previousPath: string | null;
+    constructor() {
+        /**
+         * Stores all registered routes
+         */
+        this.routes = {}
+
+        /**
+         * Current URL pathname
+         */
+        this.currentPath = window.location.pathname;
+
+        /**
+         * Previous URL pathname
+         */
+        this.previousPath = null;
+
+        /**
+         * Event listener for the popstate event
+         */
+        const handlePopstate = this.handlePopstate.bind(this);
+        /**
+         * Event listener for the click event
+         */
+        const handleClick = this.handleClick.bind(this);
+
+        /**
+         * Add popstate event listener to the window
+         */
+        window.addEventListener('popstate', handlePopstate);
+        /**
+         * Add click event listener to the window
+         */
+        window.addEventListener('click', handleClick);
     }
-}
 
-/**
- * Handles routing by updating the browser's history and calling the `handleLocation` function.
- * @param e - The event object.
- */
-const Route = (e: any) => {
-    e = e || window.event;
-    e.preventDefault();
+    on(path: string, callback: RouteCallback) {
+        this.routes[path] = callback;
+    }
 
-    window.history.pushState({}, '', e.target.href);
-    handleLocation();
-}
+    navigateTo(path: string): void {
+        history.pushState({}, '', path);
+        this.handleRoute();
+    }
 
-export const routes: Record<string | number, string> = {
-    // 404: '/404',
-    // '/': 'Home',
-    // '/about': 'About',
-    // '/contact': 'Contact'
-}
+    handlePopstate() {
+        this.handleRoute();
+    }
 
-/**
- * Creates a link element and appends it to the document body.
- * @param route - The URL route for the link.
- * @param text - The text to be displayed for the link.
- */
-export const Link = (route: string, text: string) => {
-    const a = document.createElement('a'); // Create the anchor element
-    a.href = route; // Set the href attribute
 
-    // Add the text to the anchor element
-    const linkText = document.createTextNode(text);
-    a.appendChild(linkText);
-
-    // Append the anchor element to the document body
-    document.body.appendChild(a);
-    return a;
-}
-
-/**
- * Handles the current location by fetching the corresponding route and updating the HTML content.
- * @returns {Promise<void>} A promise that resolves when the HTML content is updated.
- */
-const handleLocation = async (): Promise<void> => {
-    console.log("handleLocationTEST")
-    const path = window.location.pathname;
-    const route = routes[path] || routes[404];
-    const modulePath = `./pages/${route}`;
-    console.log(modulePath)
-    try {
-        const module = await import(modulePath);
-        if (typeof module.default === 'function') {
-            module.default();
-        } else {
-            console.error(`Module '${modulePath}' does not have a default export function.`);
+    /**
+     * Handles the click event and prevents default behavior for anchor elements.
+     *
+     * @param {MouseEvent} e - The click event
+     * @return {void} 
+     */
+    handleClick(e: MouseEvent): void {
+        // if the target is an anchor element -- and--  it has a href attribute, prevent default behavior and navigate to the href
+        if (e.target instanceof HTMLAnchorElement && e.target.href) {
+            e.preventDefault();
+            this.navigateTo(e.target.href as string);
         }
-    } catch (error) {
-        console.error(`Failed to import module '${modulePath}':`, error);
     }
-    console.log("handleLocationTEST22222")
-}
-window.onpopstate = handleLocation;
-console.log("Routing loaded.")
 
-window.route = Route; // Expose the route function to the window object
+    /**
+     * Handles the route change.
+     *
+     * If the route exists in the registered routes, it calls the callback function.
+     * Otherwise it logs a 404 error message to the console.
+     */
+    handleRoute() {
+        const currentPath = window.location.pathname as string;
+
+        // If the current path is the same as the previous one, do nothing
+        if (this.currentPath === currentPath) {
+            return;
+        }
+
+        // Update the previous and current path
+        this.previousPath = this.currentPath;
+        this.currentPath = currentPath;
+
+        // Get the callback function for the current path
+        const callback = this.routes[currentPath];
+
+        // If the route exists, call its callback function
+        if (callback) {
+            callback();
+        } else {
+            // Otherwise log a 404 error
+            console.error("404: ", currentPath);
+        }
+    }
+
+}
+
+
+const router = new Router();
+
+// router.on('/', () => {
+//     console.log('Home Page');
+// });
+
+// router.on('/about', () => {
+//     console.log('About Page');
+// });
+
+// router.on('/contact', () => {
+//     console.log('Contact Page');
+// });
+
+export default router

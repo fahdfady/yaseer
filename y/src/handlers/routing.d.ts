@@ -1,7 +1,14 @@
-declare global {
-    interface Window {
-        route: (e: any) => void;
-    }
+type RouteCallback = () => void;
+declare class Router {
+    private routes;
+    private currentPath;
+    private previousPath;
+    constructor();
+    on(path: string, callback: RouteCallback): void;
+    navigateTo(path: string): void;
+    handlePopstate(): void;
+    handleClick(e: MouseEvent): void;
+    handleRoute(): void;
 }
-export declare const routes: Record<string | number, string>;
-export declare const Link: (route: string, text: string) => HTMLAnchorElement;
+declare const router: Router;
+export default router;

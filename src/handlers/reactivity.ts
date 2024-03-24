@@ -1,7 +1,4 @@
-interface Running {
-    execute: () => void;
-    dependencies: Set<Set<() => void>>;
-}
+
 // Declares a constant named "context" with a type of an array of "Running" objects. It is initialized as an empty array.
 const context: Running[] = [];
 

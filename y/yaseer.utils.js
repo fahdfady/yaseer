@@ -1,98 +1,121 @@
-function p(e, t, n) {
+var h = Object.defineProperty;
+var l = (t, e, n) => e in t ? h(t, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : t[e] = n;
+var a = (t, e, n) => (l(t, typeof e != "symbol" ? e + "" : e, n), n);
+function P(t, e, n) {
   let o;
-  function c() {
+  function r() {
     if (!o) {
-      o = document.createElement(e);
-      for (const r in t) {
-        const s = t[r];
-        r.startsWith("on") && typeof s == "function" ? o.addEventListener(r.substring(2), s) : o.setAttribute(r, s);
+      o = document.createElement(t);
+      for (const s in e) {
+        const i = e[s];
+        s.startsWith("on") && typeof i == "function" ? (console.log("somoeone help me", s, i), o.addEventListener(s.substring(2), i)) : o.setAttribute(s, i);
       }
     }
     return n && (o.textContent = `${n}`), o;
   }
-  return c();
+  return r();
 }
-function h(e, t) {
-  e.appendChild(t);
+function g(t, e) {
+  let n;
+  Array.isArray(e) ? n = e.map((o) => o.outerHTML) : n = [e.outerHTML], t.innerHTML = n.join("");
 }
-function m(e, t) {
-  if (Array.isArray(t))
-    for (const n of t)
+function w(t, e) {
+  if (Array.isArray(e))
+    for (const n of e)
       if (Array.isArray(n))
         for (const o of n)
-          e.appendChild(o);
+          t.appendChild(o);
       else
-        e.appendChild(n);
+        t.appendChild(n);
   else
-    e.appendChild(t);
-  return e;
+    t.appendChild(e);
+  return t;
 }
-const d = [];
-function l(e, t) {
-  t.add(e), e.dependencies.add(t);
+const c = [];
+function u(t, e) {
+  e.add(t), t.dependencies.add(e);
 }
-function u(e) {
-  for (const t of e.dependencies)
-    t.delete(e);
-  e.dependencies.clear();
+function d(t) {
+  for (const e of t.dependencies)
+    e.delete(t);
+  t.dependencies.clear();
 }
-function w(e) {
-  const t = /* @__PURE__ */ new Set();
+function y(t) {
+  const e = /* @__PURE__ */ new Set();
   return [() => {
-    const c = d[d.length - 1];
-    return c && l(c, t), e;
-  }, (c) => {
-    e = c;
-    for (const r of [...t])
-      r.execute();
+    const r = c[c.length - 1];
+    return r && u(r, e), t;
+  }, (r) => {
+    t = r;
+    for (const s of [...e])
+      s.execute();
   }];
 }
-function y(e) {
-  const t = () => {
-    u(n), d.push(n);
+function m(t) {
+  const e = () => {
+    d(n), c.push(n);
     try {
-      e();
+      t();
     } finally {
     }
   }, n = {
-    execute: t,
+    execute: e,
     dependencies: /* @__PURE__ */ new Set()
   };
-  t();
+  e();
 }
-const f = (e) => {
-  e = e || window.event, e.preventDefault(), window.history.pushState({}, "", e.target.href), a();
-}, i = {
-  // 404: '/404',
-  // '/': 'Home',
-  // '/about': 'About',
-  // '/contact': 'Contact'
-}, g = (e, t) => {
-  const n = document.createElement("a");
-  n.href = e;
-  const o = document.createTextNode(t);
-  return n.appendChild(o), document.body.appendChild(n), n;
-}, a = async () => {
-  console.log("handleLocationTEST");
-  const e = window.location.pathname, n = `./pages/${i[e] || i[404]}`;
-  console.log(n);
-  try {
-    const o = await import(n);
-    typeof o.default == "function" ? o.default() : console.error(`Module '${n}' does not have a default export function.`);
-  } catch (o) {
-    console.error(`Failed to import module '${n}':`, o);
+class f {
+  constructor() {
+    /**
+     * Class to handle routing
+     * 
+     * @constructor
+     */
+    a(this, "routes");
+    a(this, "currentPath");
+    a(this, "previousPath");
+    this.routes = {}, this.currentPath = window.location.pathname, this.previousPath = null;
+    const e = this.handlePopstate.bind(this), n = this.handleClick.bind(this);
+    window.addEventListener("popstate", e), window.addEventListener("click", n);
   }
-  console.log("handleLocationTEST22222");
-};
-window.onpopstate = a;
-console.log("Routing loaded.");
-window.route = f;
+  on(e, n) {
+    this.routes[e] = n;
+  }
+  navigateTo(e) {
+    history.pushState({}, "", e), this.handleRoute();
+  }
+  handlePopstate() {
+    this.handleRoute();
+  }
+  /**
+   * Handles the click event and prevents default behavior for anchor elements.
+   *
+   * @param {MouseEvent} e - The click event
+   * @return {void} 
+   */
+  handleClick(e) {
+    e.target instanceof HTMLAnchorElement && e.target.href && (e.preventDefault(), this.navigateTo(e.target.href));
+  }
+  /**
+   * Handles the route change.
+   *
+   * If the route exists in the registered routes, it calls the callback function.
+   * Otherwise it logs a 404 error message to the console.
+   */
+  handleRoute() {
+    const e = window.location.pathname;
+    if (this.currentPath === e)
+      return;
+    this.previousPath = this.currentPath, this.currentPath = e;
+    const n = this.routes[e];
+    n ? n() : console.error("404: ", e);
+  }
+}
+new f();
 export {
-  g as Link,
-  y as createEffect,
-  w as createSignal,
-  m as nest,
-  h as renderAppDDOM,
-  i as routes,
-  p as template
+  m as createEffect,
+  y as createSignal,
+  w as nest,
+  g as renderAppDDOM,
+  P as template
 };

@@ -1,4 +1,3 @@
-import { Link } from "./handlers/routing.js";
 
 export * from "./handlers/ddom.js";
 export * from "./handlers/nest.js";
