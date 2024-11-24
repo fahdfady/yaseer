@@ -34,15 +34,51 @@ export function template(tag: string, props?: Record<string, string | Function>,
 }
 
 
+
+/**
+ * Render a DDOM app by replacing the content of a root element with new content
+ * @param root The root element to update
+ * @param containerElement The new elements to use for the content of the root element
+ * Before updating the content, iterate over the existing elements and store their event listeners in a data attribute.
+ *Update the content of the root element.
+ *After updating the content, reattach the event listeners from the stored data attribute to the corresponding elements in the new content.
+ */
 export function renderAppDDOM(root: HTMLElement, containerElement: HTMLElement | HTMLElement[]): void {
-    let elements: string[];
+    let elements: HTMLElement[];
 
     if (Array.isArray(containerElement)) {
-        elements = containerElement.map(child => child.outerHTML);
-    }
-    else {
-        elements = [containerElement.outerHTML];
+        elements = containerElement;
+    } else {
+        elements = [containerElement];
     }
 
-    root.innerHTML = elements.join('');
+    // Store event listeners before updating content .. manually transferring the event listeners from the old elements to the new elements before replacing the content. This way, the event listeners will be preserved even after the content is updated.
+    const eventListenersMap = new Map<HTMLElement, Map<string, EventListener>>(); // Map of elements to their event listeners
+    elements.forEach(element => {
+        const eventListeners = new Map<string, EventListener>(); // Map of event listener names to their functions
+        element.getAttributeNames().forEach(attr => {
+            if (attr.startsWith('on')) {
+                const eventName = attr.slice(2); // Remove "on" from the attribute name to get the event name
+                const eventListener = element.getAttribute(attr); // Get the event listener function from the attribute
+                if (eventName && eventListener) {
+                    eventListeners.set(eventName, new Function(eventListener) as EventListener); // Set the event listener function
+                    element.removeAttribute(attr); // Remove the event listener attribute from the element
+                }
+            }
+        });
+        eventListenersMap.set(element, eventListeners); // Add the element and its event listeners to the map
+    });
+
+    // Update content
+    root.innerHTML = ''; // Clear the root element before adding new content
+    elements.forEach(element => {
+        root.appendChild(element);
+    });
+
+    // Reattach event listeners
+    eventListenersMap.forEach((eventListeners, element) => {
+        eventListeners.forEach((listener, eventName) => {
+            element.addEventListener(eventName, listener); // Add the event listener back to the element
+        });
+    });
 }

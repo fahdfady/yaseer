@@ -7,8 +7,8 @@ class Router {
      * @constructor
      */
     private routes: { [key: string]: RouteCallback };
-    private currentPath: string;
-    private previousPath: string | null;
+    private currentPath: string = window.location.pathname;
+    private previousPath: string | null = null;
     constructor() {
         /**
          * Stores all registered routes
@@ -42,6 +42,8 @@ class Router {
          * Add click event listener to the window
          */
         window.addEventListener('click', handleClick);
+
+        this.handleRoute();
     }
 
     on(path: string, callback: RouteCallback) {
@@ -57,14 +59,13 @@ class Router {
         this.handleRoute();
     }
 
-
     /**
      * Handles the click event and prevents default behavior for anchor elements.
      *
-     * @param {MouseEvent} e - The click event
+     * @param {Event} e - The click event
      * @return {void} 
      */
-    handleClick(e: MouseEvent): void {
+    handleClick(e: Event): void {
         // if the target is an anchor element -- and--  it has a href attribute, prevent default behavior and navigate to the href
         if (e.target instanceof HTMLAnchorElement && e.target.href) {
             e.preventDefault();
@@ -104,9 +105,7 @@ class Router {
 
 }
 
-
 export const router = new Router();
-
 // router.on('/', () => {
 //     console.log('Home Page');
 // });
@@ -117,4 +116,8 @@ export const router = new Router();
 
 // router.on('/contact', () => {
 //     console.log('Contact Page');
+// });
+
+// router.on('*', () => {
+//     console.log('404 Page');
 // });
