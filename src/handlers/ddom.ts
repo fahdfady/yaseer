@@ -1,5 +1,3 @@
-import { nest } from "./nest.js";
-
 export function template(tag: string, props?: Record<string, string | Function>, text?: string): HTMLElement {
     let element: HTMLElement;
 
