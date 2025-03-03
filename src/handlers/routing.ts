@@ -1,4 +1,14 @@
 type RouteCallback = () => void;
+type RouteGuard = (to: Route, from: Route) => boolean | Promise<boolean>;
+type RouteParams = { [key: string]: string };
+
+interface Route {
+    path: string;
+    callback: RouteCallback;
+    guards?: RouteGuard[];
+    params?: RouteParams;
+    query?: URLSearchParams;
+}
 
 class Router {
     /**
@@ -6,14 +16,16 @@ class Router {
      * 
      * @constructor
      */
-    private routes: { [key: string]: RouteCallback };
-    private currentPath: string = window.location.pathname;
-    private previousPath: string | null = null;
+    private routes: Map<string, Route>;
+    private currentPath: string;
+    private previousPath: string | null;
+    private wildcardRoute?: Route;
+    
     constructor() {
         /**
          * Stores all registered routes
          */
-        this.routes = {}
+        this.routes = new Map();
 
         /**
          * Current URL pathname
@@ -46,16 +58,33 @@ class Router {
         this.handleRoute();
     }
 
-    on(path: string, callback: RouteCallback) {
-        this.routes[path] = callback;
+    /**
+     * Register a route with optional guards
+     */
+    on(path: string, callback: RouteCallback, guards?: RouteGuard[]) {
+        if (path === '*') {
+            this.wildcardRoute = { path, callback, guards };
+            return;
+        }
+
+        this.routes.set(path, { path, callback, guards });
     }
 
-    navigateTo(path: string): void {
-        history.pushState({}, '', path);
-        this.handleRoute();
+    /**
+     * Navigate to a path with optional query parameters
+     */
+    async navigateTo(path: string, query?: Record<string, string>): Promise<void> {
+        let url = path;
+        if (query) {
+            const searchParams = new URLSearchParams(query);
+            url = `${path}?${searchParams.toString()}`;
+        }
+        
+        history.pushState({}, '', url);
+        await this.handleRoute();
     }
 
-    handlePopstate() {
+    private handlePopstate() {
         this.handleRoute();
     }
 
@@ -65,44 +94,92 @@ class Router {
      * @param {Event} e - The click event
      * @return {void} 
      */
-    handleClick(e: Event): void {
+    private handleClick(e: Event): void {
         // if the target is an anchor element -- and--  it has a href attribute, prevent default behavior and navigate to the href
         if (e.target instanceof HTMLAnchorElement && e.target.href) {
             e.preventDefault();
-            this.navigateTo(e.target.href as string);
+            const url = new URL(e.target.href);
+            this.navigateTo(url.pathname, Object.fromEntries(url.searchParams));
         }
     }
 
     /**
-     * Handles the route change.
-     *
-     * If the route exists in the registered routes, it calls the callback function.
-     * Otherwise it logs a 404 error message to the console.
+     * Match route patterns like /users/:id
      */
-    handleRoute() {
-        const currentPath = window.location.pathname as string;
+    private matchRoute(pathname: string): Route | undefined {
+        // First try exact match
+        if (this.routes.has(pathname)) {
+            return this.routes.get(pathname);
+        }
 
-        // If the current path is the same as the previous one, do nothing
+        // Then try pattern matching
+        for (const [pattern, route] of this.routes) {
+            if (pattern.includes(':')) {
+                const patternParts = pattern.split('/');
+                const pathParts = pathname.split('/');
+
+                if (patternParts.length === pathParts.length) {
+                    const params: RouteParams = {};
+                    let matches = true;
+
+                    for (let i = 0; i < patternParts.length; i++) {
+                        if (patternParts[i].startsWith(':')) {
+                            params[patternParts[i].slice(1)] = pathParts[i];
+                        } else if (patternParts[i] !== pathParts[i]) {
+                            matches = false;
+                            break;
+                        }
+                    }
+
+                    if (matches) {
+                        return { ...route, params };
+                    }
+                }
+            }
+        }
+
+        return this.wildcardRoute;
+    }
+
+    /**
+     * Handle route changes with guards and params
+     */
+    private async handleRoute(): Promise<void> {
+        const url = new URL(window.location.href);
+        const currentPath = url.pathname;
+
         if (this.currentPath === currentPath) {
             return;
         }
 
-        // Update the previous and current path
+        const route = this.matchRoute(currentPath);
+        if (!route) {
+            console.error("404: ", currentPath);
+            return;
+        }
+
+        // Check route guards
+        if (route.guards) {
+            const fromRoute = this.matchRoute(this.currentPath);
+            for (const guard of route.guards) {
+                const canProceed = await guard(route, fromRoute!);
+                if (!canProceed) {
+                    history.back();
+                    return;
+                }
+            }
+        }
+
+        // Update paths
         this.previousPath = this.currentPath;
         this.currentPath = currentPath;
 
-        // Get the callback function for the current path
-        const callback = this.routes[currentPath];
+        // Add query parameters to route
+        route.query = url.searchParams;
 
-        // If the route exists, call its callback function
-        if (callback) {
-            callback();
-        } else {
-            // Otherwise log a 404 error
-            console.error("404: ", currentPath);
-        }
+        // Execute route callback
+        route.callback();
     }
-
 }
 
 export const router = new Router();
